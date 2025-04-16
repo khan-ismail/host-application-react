@@ -1,0 +1,42 @@
+// ---------------------------------------------- blow is the original code ----------------------------------------------
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import federation from '@originjs/vite-plugin-federation';
+
+export default defineConfig({
+  server: {
+    port: 5001,
+    strictPort: true,
+  },
+  plugins: [
+    react(),
+    federation({
+      name: 'hostApp',
+      remotes: {
+        cxAnalytics: 'http://localhost:4173/assets/remoteEntry.js',
+      },
+      shared: {
+        react: {
+          singleton: true,
+          requiredVersion: '^18.3.1',
+          strictVersion: true,
+        },
+        'react-dom': {
+          singleton: true,
+          requiredVersion: '^18.3.1',
+          strictVersion: true,
+        },
+      },
+    }),
+  ],
+  optimizeDeps: {
+    exclude: ['cxAnalytics'],
+  },
+  build: {
+    target: 'es2022',
+    modulePreload: false,
+    rollupOptions: {
+      external: ['cxAnalytics'],
+    },
+  },
+});
